@@ -14,6 +14,7 @@
 #include "libft.h"
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 int		ft_arrsize(char **arr)
 {
@@ -47,6 +48,15 @@ char	**ft_arrcopy(char **src, int fd)
 	return (dest);
 }
 
+void	ft_swap_p(char **s1, char **s2)
+{
+	char	*temp;
+
+	temp = *s1;
+	*s1 = *s2;
+	*s2 = temp;
+}
+
 int		get_next_line(const int fd, char **line)
 {
 	static char	**storage;
@@ -77,6 +87,7 @@ int		get_next_line(const int fd, char **line)
 		*(storage + fd - 1) = ft_strjoin(*(storage + fd - 3), buffer);
 		if (**(storage + fd - 3))
 			ft_strdel(storage + fd - 3);
+		printf("s: %s", *(storage + fd - 1));
 		if ((end_line = ft_strchr(*(storage + fd - 1), '\n')) != NULL)
 		{
 			*line = ft_strsub(*(storage + fd - 1), 0, \
@@ -84,6 +95,10 @@ int		get_next_line(const int fd, char **line)
 			*(storage + fd - 3) = ft_strdup(end_line + 1);
 			ft_strdel(storage + fd - 1);
 			return (1);
+		}
+		else
+		{
+			ft_swap_p(storage + fd - 3, storage + fd - 1);
 		}
 	}
 	return (0);
