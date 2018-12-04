@@ -14,7 +14,6 @@
 #include "libft.h"
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 int		ft_arrsize(char **arr)
 {
