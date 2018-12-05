@@ -40,7 +40,7 @@ int		get_next_line(const int fd, char **line)
 	char			*temp;
 	size_t			bytes;
 
-	if (fd < 0 || fd == 1 || fd == 2)
+	if (fd < 0 || read(fd, buffer, 0) < 0)
 		return (-1);
 	temp_list = ft_getlist_fd(&list, fd);
 	temp = temp_list->content;
