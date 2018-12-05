@@ -67,7 +67,7 @@ int				get_next_line(const int fd, char **line)
 		temp = ft_strjoin(temp_list->content, buffer);
 		ft_strdel((char**)&temp_list->content);
 		if (ft_strchr(temp, '\n') != NULL)
-			break;
+			break ;
 		temp_list->content = temp;
 	}
 	return (ft_get_result(temp, temp_list, line));
