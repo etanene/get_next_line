@@ -15,7 +15,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-t_list	*ft_getlist_fd(t_list **list, int fd)
+static t_list	*ft_getlist_fd(t_list **list, int fd)
 {
 	t_list	*temp;
 
@@ -32,7 +32,24 @@ t_list	*ft_getlist_fd(t_list **list, int fd)
 	return (temp);
 }
 
-int		get_next_line(const int fd, char **line)
+static int		ft_get_result(char *temp, t_list *temp_list, char **line)
+{
+	if (temp && *temp)
+	{
+		if ((temp_list->content = ft_strchr(temp, '\n')) != NULL)
+		{
+			*line = ft_strsub(temp, 0, (char*)temp_list->content - temp);
+			temp_list->content = ft_strdup(temp_list->content + 1);
+		}
+		else
+			*line = ft_strdup(temp);
+		ft_strdel(&temp);
+		return (1);
+	}
+	return (0);
+}
+
+int				get_next_line(const int fd, char **line)
 {
 	static t_list	*list;
 	t_list			*temp_list;
@@ -53,17 +70,5 @@ int		get_next_line(const int fd, char **line)
 			break;
 		temp_list->content = temp;
 	}
-	if (temp && *temp)
-	{
-		if ((temp_list->content = ft_strchr(temp, '\n')) != NULL)
-		{
-			*line = ft_strsub(temp, 0, (char*)temp_list->content - temp);
-			temp_list->content = ft_strdup(temp_list->content + 1);
-		}
-		else
-			*line = ft_strdup(temp);
-		ft_strdel(&temp);
-		return (1);
-	}
-	return (0);
+	return (ft_get_result(temp, temp_list, line));
 }
