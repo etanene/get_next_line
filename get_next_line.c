@@ -36,13 +36,13 @@ int		get_next_line(const int fd, char **line)
 {
 	static t_list	*list;
 	t_list			*temp_list;
-	char			buffer[BUFF_SIZE];
+	char			buffer[BUFF_SIZE + 1];
 	char			*temp;
 	size_t			bytes;
 
 	temp_list = ft_getlist_fd(&list, fd);
 	temp = temp_list->content;
-	while ((bytes = read(fd, buffer, BUFF_SIZE - 1)) > 0)
+	while ((bytes = read(fd, buffer, BUFF_SIZE)) > 0)
 	{
 		buffer[bytes] = '\0';
 		temp = ft_strjoin(temp_list->content, buffer);
@@ -51,7 +51,7 @@ int		get_next_line(const int fd, char **line)
 			break;
 		temp_list->content = temp;
 	}
-	if (*temp)
+	if (temp && *temp)
 	{
 		if ((temp_list->content = ft_strchr(temp, '\n')) != NULL)
 		{
