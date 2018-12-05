@@ -14,92 +14,54 @@
 #include "libft.h"
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h>
 
-int		ft_arrsize(char **arr)
+t_list	*ft_getlist_fd(t_list **list, int fd)
 {
-	int		count;
+	t_list	*temp;
 
-	count = 0;
-	while (*arr++)
-		count++;
-	return (count);
-}
-
-char	**ft_arrcopy(char **src, int fd)
-{
-	char	**dest;
-	char	**new_dest;
-
-	if (!(dest = (char**)malloc(sizeof(char*) * (fd + 1))))
-		return (NULL);
-	new_dest = dest;
-	if (!src)
+	temp = *list;
+	while (temp)
 	{
-		while (fd--)
-			*new_dest++ = NULL;
+		if (temp->content_size == (size_t)fd)
+			return (temp);
+		temp = temp->next;
 	}
-	else
-	{
-		while (fd--)
-			*new_dest++ = *src++;
-	}
-	*new_dest = NULL;
-	return (dest);
-}
-
-void	ft_swap_p(char **s1, char **s2)
-{
-	char	*temp;
-
-	temp = *s1;
-	*s1 = *s2;
-	*s2 = temp;
+	temp = ft_lstnew("", fd);
+	ft_lstadd(list, temp);
+	temp = *list;
+	return (temp);
 }
 
 int		get_next_line(const int fd, char **line)
 {
-	static char	**storage;
-	char		**temp_storage;
-	char		*end_line;
-	char		buffer[BUFF_SIZE];
-	size_t		bytes;
+	static t_list	*list;
+	t_list			*temp_list;
+	char			buffer[BUFF_SIZE];
+	char			*temp;
+	size_t			bytes;
 
-	if (!storage || ft_arrsize(storage) < fd + 1)
-	{
-		if (!storage)
-		{
-			storage = NULL;
-		}
-		temp_storage = storage;
-		if (!(storage = ft_arrcopy(temp_storage, fd)))
-		{
-			storage = temp_storage;
-			return (-1);
-		}
-	}
+	temp_list = ft_getlist_fd(&list, fd);
+	temp = temp_list->content;
 	while ((bytes = read(fd, buffer, BUFF_SIZE - 1)) > 0)
 	{
 		buffer[bytes] = '\0';
-		if (!*(storage + fd - 3))
-			*(storage + fd - 3) = "";
-		temp_storage = storage;
-		*(storage + fd - 1) = ft_strjoin(*(storage + fd - 3), buffer);
-		if (**(storage + fd - 3))
-			ft_strdel(storage + fd - 3);
-		printf("s: %s", *(storage + fd - 1));
-		if ((end_line = ft_strchr(*(storage + fd - 1), '\n')) != NULL)
+		temp = ft_strjoin(temp_list->content, buffer);
+		ft_strdel((char**)&temp_list->content);
+		if (ft_strchr(temp, '\n') != NULL)
+			break;
+		temp_list->content = temp;
+	}
+	if (*temp)
+	{
+		if ((temp_list->content = ft_strchr(temp, '\n')) != NULL)
 		{
-			*line = ft_strsub(*(storage + fd - 1), 0, \
-						end_line - *(storage + fd - 1));
-			*(storage + fd - 3) = ft_strdup(end_line + 1);
-			ft_strdel(storage + fd - 1);
-			return (1);
+			*line = ft_strsub(temp, 0, (char*)temp_list->content - temp);
+			temp_list->content = ft_strdup(temp_list->content + 1);
 		}
 		else
-		{
-			ft_swap_p(storage + fd - 3, storage + fd - 1);
-		}
+			*line = ft_strdup(temp);
+		ft_strdel(&temp);
+		return (1);
 	}
 	return (0);
 }
