@@ -59,15 +59,20 @@ static int		ft_get_result(char *temp, t_list *temp_list, char **line)
 	{
 		if ((temp_list->content = ft_strchr(temp, '\n')) != NULL)
 		{
-			if (!(*line = ft_strsub(temp, 0, (char*)temp_list->content - temp)))
+			if (!(*line = ft_strsub(temp, 0, (char*)temp_list->content - temp))\
+				|| !(temp_list->content = ft_strdup(temp_list->content + 1)))
+			{
+				ft_strdel(&temp);
 				return (-1);
-			if (!(temp_list->content = ft_strdup(temp_list->content + 1)))
-				return (-1);
+			}
 		}
 		else
 		{
 			if (!(*line = ft_strdup(temp)))
+			{
+				ft_strdel(&temp);
 				return (-1);
+			}
 		}
 		ft_strdel(&temp);
 		return (1);
