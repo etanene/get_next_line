@@ -25,7 +25,7 @@ static void		ft_freelist_fd(t_list **list, int fd)
 	while (curr)
 	{
 		if (curr->content_size == (size_t)fd)
-			break;
+			break ;
 		prev = curr;
 		curr = curr->next;
 	}
