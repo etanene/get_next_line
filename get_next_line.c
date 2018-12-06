@@ -15,6 +15,28 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+static void		ft_freelist_fd(t_list **list, int fd)
+{
+	t_list	*curr;
+	t_list	*prev;
+
+	curr = *list;
+	prev = NULL;
+	while (curr)
+	{
+		if (curr->content_size == (size_t)fd)
+			break;
+		prev = curr;
+		curr = curr->next;
+	}
+	if (prev)
+		prev->next = curr->next;
+	else
+		*list = curr->next;
+	ft_memdel(&curr->content);
+	free(curr);
+}
+
 static t_list	*ft_getlist_fd(t_list **list, int fd)
 {
 	t_list	*temp;
@@ -26,7 +48,8 @@ static t_list	*ft_getlist_fd(t_list **list, int fd)
 			return (temp);
 		temp = temp->next;
 	}
-	temp = ft_lstnew("", fd);
+	if (!(temp = ft_lstnew("", fd)))
+		return (NULL);
 	ft_lstadd(list, temp);
 	temp = *list;
 	return (temp);
@@ -57,9 +80,8 @@ int				get_next_line(const int fd, char **line)
 	char			*temp;
 	size_t			bytes;
 
-	if (fd < 0 || read(fd, buffer, 0) < 0)
+	if (!(temp_list = ft_getlist_fd(&list, fd)) || read(fd, buffer, 0) < 0)
 		return (-1);
-	temp_list = ft_getlist_fd(&list, fd);
 	temp = temp_list->content;
 	while ((bytes = read(fd, buffer, BUFF_SIZE)) > 0)
 	{
@@ -70,5 +92,8 @@ int				get_next_line(const int fd, char **line)
 			break ;
 		temp_list->content = temp;
 	}
-	return (ft_get_result(temp, temp_list, line));
+	if (ft_get_result(temp, temp_list, line))
+		return (1);
+	ft_freelist_fd(&list, fd);
+	return (0);
 }
