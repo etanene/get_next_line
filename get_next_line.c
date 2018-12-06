@@ -101,7 +101,7 @@ int				get_next_line(const int fd, char **line)
 			return (ft_get_result(temp, temp_list, line));
 		temp_list->content = temp;
 	}
-	if (!temp || !*temp)
+	if (!(temp && *temp))
 		ft_freelist_fd(&list, fd);
 	return (ft_get_result(temp, temp_list, line));
 }
