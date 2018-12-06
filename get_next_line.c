@@ -12,8 +12,6 @@
 
 #include "get_next_line.h"
 #include "libft.h"
-#include <unistd.h>
-#include <stdlib.h>
 
 static void		ft_freelist_fd(t_list **list, int fd)
 {
@@ -61,11 +59,16 @@ static int		ft_get_result(char *temp, t_list *temp_list, char **line)
 	{
 		if ((temp_list->content = ft_strchr(temp, '\n')) != NULL)
 		{
-			*line = ft_strsub(temp, 0, (char*)temp_list->content - temp);
-			temp_list->content = ft_strdup(temp_list->content + 1);
+			if (!(*line = ft_strsub(temp, 0, (char*)temp_list->content - temp)))
+				return (-1);
+			if (!(temp_list->content = ft_strdup(temp_list->content + 1)))
+				return (-1);
 		}
 		else
-			*line = ft_strdup(temp);
+		{
+			if (!(*line = ft_strdup(temp)))
+				return (-1);
+		}
 		ft_strdel(&temp);
 		return (1);
 	}
@@ -86,14 +89,17 @@ int				get_next_line(const int fd, char **line)
 	while ((bytes = read(fd, buffer, BUFF_SIZE)) > 0)
 	{
 		buffer[bytes] = '\0';
-		temp = ft_strjoin(temp_list->content, buffer);
+		if (!(temp = ft_strjoin(temp_list->content, buffer)))
+			return (-1);
 		ft_strdel((char**)&temp_list->content);
 		if (ft_strchr(temp, '\n') != NULL)
 			break ;
 		temp_list->content = temp;
 	}
-	if (ft_get_result(temp, temp_list, line))
+	if ((bytes = ft_get_result(temp, temp_list, line)) == 1)
 		return (1);
+	else if (bytes > 1)
+		return (-1);
 	ft_freelist_fd(&list, fd);
 	return (0);
 }
