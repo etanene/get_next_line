@@ -98,13 +98,10 @@ int				get_next_line(const int fd, char **line)
 			return (-1);
 		ft_strdel((char**)&temp_list->content);
 		if (ft_strchr(temp, '\n') != NULL)
-			break ;
+			return (ft_get_result(temp, temp_list, line));
 		temp_list->content = temp;
 	}
-	if ((bytes = ft_get_result(temp, temp_list, line)) == 1)
-		return (1);
-	else if (bytes > 1)
-		return (-1);
-	ft_freelist_fd(&list, fd);
-	return (0);
+	if (!temp || !*temp)
+		ft_freelist_fd(&list, fd);
+	return (ft_get_result(temp, temp_list, line));
 }
