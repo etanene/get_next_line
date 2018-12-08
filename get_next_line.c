@@ -35,7 +35,7 @@ static void		ft_freelist_fd(t_list **list, int fd)
 	free(curr);
 }
 
-static t_list	*ft_getlist_fd(t_list **list, int fd)
+static t_list	*ft_get_fd(t_list **list, int fd)
 {
 	t_list	*temp;
 
@@ -88,7 +88,7 @@ int				get_next_line(const int fd, char **line)
 	char			*temp;
 	size_t			bytes;
 
-	if (!(temp_list = ft_getlist_fd(&list, fd)) || read(fd, buffer, 0) < 0)
+	if (!line || read(fd, buffer, 0) < 0 || !(temp_list = ft_get_fd(&list, fd)))
 		return (-1);
 	temp = temp_list->content;
 	while ((bytes = read(fd, buffer, BUFF_SIZE)) > 0)
